@@ -49,8 +49,3 @@ const game = new Phaser.Game(config);
 window.addEventListener('resize', () => {
     game.scale.resize(window.innerWidth, window.innerHeight);
 });
-
-//these are for manually adding the scene and starting 
-// game.scene.add(SCENE_KEYS.PRELOAD_SCENE, PreloadScene)
-// game.scene.start(SCENE_KEYS.PRELOAD_SCENE);
-

@@ -2,67 +2,73 @@ import Phaser from '../lib/phaser.js'
 
 export class Player {
     constructor(scene) {
+        this.scene = scene; // Store the scene reference
+
         // Create the sprite and assign it to a class property
-        this.sprite = scene.physics.add.sprite(32, 32, 'RougeWalk');
+        this.sprite = scene.physics.add.sprite(32, 32, 'RogueWalk');
         
         // Create animations
         scene.anims.create({
             key: 'right',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 0, end: 3 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 0, end: 3 }),
             frameRate: 6,
             repeat: -1
         });
         scene.anims.create({
             key: 'down',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 0, end: 3 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 0, end: 3 }),
             frameRate: 6,
             repeat: -1
         });
         scene.anims.create({
             key: 'downRight',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 0, end: 3 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 0, end: 3 }),
             frameRate: 6,
             repeat: -1
         });
-    
         scene.anims.create({
             key: 'left',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 4, end: 7 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 4, end: 7 }),
             frameRate: 6,
             repeat: -1
         });
         scene.anims.create({
             key: 'downLeft',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 4, end: 7 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 4, end: 7 }),
             frameRate: 6,
             repeat: -1
         });
-    
         scene.anims.create({
             key: 'upRight',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 8, end: 11 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 8, end: 11 }),
             frameRate: 6,
             repeat: -1
         });
         scene.anims.create({
             key: 'up',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 8, end: 11 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 8, end: 11 }),
             frameRate: 6,
             repeat: -1
         });
-
         scene.anims.create({
             key: 'upLeft',
-            frames: scene.anims.generateFrameNumbers('RougeWalk', { start: 12, end: 15 }),
+            frames: scene.anims.generateFrameNumbers('RogueWalk', { start: 12, end: 15 }),
             frameRate: 6,
             repeat: -1
         });
-
         scene.anims.create({
             key: 'idle',
-            frames: scene.anims.generateFrameNumbers('RougeIdle', { start: 2, end: 3 }),
+            frames: scene.anims.generateFrameNumbers('RogueIdle', { start: 2, end: 3 }),
             frameRate: 4,
             repeat: -1
+        });
+
+        // Define the attack animation
+        scene.anims.create({
+            key: 'attack',
+            frames: scene.anims.generateFrameNumbers('RogueAttack', { start: 0, end: 3 }),
+            frameRate: 6,
+            repeat: 0  // Set repeat to 0 to play the animation once
         });
 
         // Add WASD input
@@ -77,24 +83,34 @@ export class Player {
         this.prevVelocityX = 0;
         this.prevVelocityY = 0;
         this.prevAnimation = '';
+
+        // Add pointer down listener for left mouse button
+        scene.input.on('pointerdown', this.handlePointerDown, this);
+    }
+
+    handlePointerDown = (pointer) => {
+        if (pointer.leftButtonDown()) {
+            this.attack();
+        }
+    }
+
+    attack() {
+        console.log('Attack triggered'); // Debug
+        this.sprite.anims.stop();
+        this.sprite.anims.play('attack', true);
+        // Add attack logic here -- dealing damage to enemies
+        // this.sprite.body.position to get the player's position
     }
     update() {
-        const speed = 75; // Movement speed
+        const speed = 75;
         let velocityX = 0;
         let velocityY = 0;
     
         // Calculate velocities based on key input
-        if (this.keys.left.isDown) {
-            velocityX = -1;
-        } else if (this.keys.right.isDown) {
-            velocityX = 1;
-        }
-    
-        if (this.keys.up.isDown) {
-            velocityY = -1;
-        } else if (this.keys.down.isDown) {
-            velocityY = 1;
-        }
+        if (this.keys.left.isDown) velocityX = -1;
+        if (this.keys.right.isDown) velocityX = 1;
+        if (this.keys.up.isDown) velocityY = -1;
+        if (this.keys.down.isDown) velocityY = 1;
     
         // Normalize diagonal velocity
         if (velocityX !== 0 || velocityY !== 0) {
@@ -103,35 +119,13 @@ export class Player {
             velocityY = (velocityY / length) * speed;
         }
     
-        // Velocity smoothing
-        const smoothing = 0.2; // Adjust smoothing factor
-        const lerp = (a, b, t) => a + (b - a) * t;
-    
-        velocityX = lerp(this.sprite.body.velocity.x, velocityX, smoothing);
-        velocityY = lerp(this.sprite.body.velocity.y, velocityY, smoothing);
-    
         // Update velocity
         this.sprite.setVelocity(velocityX, velocityY);
     
-        // Update animation statedw
+        // Update animation state
         if (velocityX !== 0 || velocityY !== 0) {
-            if (velocityX > 0 && velocityY > 0) {
-                this.sprite.anims.play('downRight', true);
-            } else if (velocityX < 0 && velocityY > 0) {
-                this.sprite.anims.play('downLeft', true);
-            } else if (velocityX > 0 && velocityY < 0) {
-                this.sprite.anims.play('upRight', true);
-            } else if (velocityX < 0 && velocityY < 0) {
-                this.sprite.anims.play('upLeft', true);
-            } else if (velocityX > 0) {
-                this.sprite.anims.play('right', true);
-            } else if (velocityX < 0) {
-                this.sprite.anims.play('left', true);
-            } else if (velocityY > 0) {
-                this.sprite.anims.play('down', true);
-            } else if (velocityY < 0) {
-                this.sprite.anims.play('up', true);
-            }
+            const animationKey = (velocityX > 0 ? 'right' : velocityX < 0 ? 'left' : velocityY > 0 ? 'down' : 'up');
+            this.sprite.anims.play(animationKey, true);
         } else {
             this.sprite.anims.stop();
         }

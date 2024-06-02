@@ -12,7 +12,8 @@ export class WorldScene extends Phaser.Scene {
 
     preload() {
         const RoguePath = '../../assets/character/Rogue/RogueWalk.png';
-        const RougeIdle = '../../assets/character/Rogue/RogueJump.png';
+        const RogueIdle = '../../assets/character/Rogue/RogueJump.png';
+        const RogueAtPath = '../../assets/character/Rogue/RogueAttack.png';
         // Load the tileset images
         this.load.image('Minifantasy_ForgottenPlainsTiles', '../../assets/map/Minifantasy_ForgottenPlainsTiles.png');
         this.load.image('OutdoorTileset', '../../assets/map/OutdoorTileset.png');
@@ -21,8 +22,9 @@ export class WorldScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('map', '../../assets/map/Map.tmj');
 
         // Load character assets
-        this.load.spritesheet('RougeWalk', RoguePath, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('RougeIdle', RougeIdle, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('RogueWalk', RoguePath, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('RogueIdle', RogueIdle, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('RogueAttack', RogueAtPath, { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
